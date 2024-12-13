@@ -10,7 +10,8 @@ function App() {
     city: '',
     expense_type: '',
     month: 1,
-    day: 1
+    day: 1,
+    year:2019
   });
   const [prediction, setPrediction] = useState(null);
 
