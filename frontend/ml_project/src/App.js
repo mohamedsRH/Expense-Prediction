@@ -2,6 +2,8 @@ import './App.css';
 import { useState } from 'react';
 import axios from 'axios';
 import { cities } from "./cities";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'; // Import CSS for date picker
 
 function App() {
   const [formData, setFormData] = useState({
@@ -9,9 +11,9 @@ function App() {
     card_type: '',
     city: '',
     expense_type: '',
-    month: 1,
     day: 1,
-    year:2019
+    month: 1,
+    year: 2019
   });
   const [prediction, setPrediction] = useState(null);
 
@@ -23,6 +25,17 @@ function App() {
       setPrediction(response.data.predicted_amount);
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  const handleDateChange = (date) => {
+    if (date) {
+      setFormData({
+        ...formData,
+        day: date.getDate(),
+        month: date.getMonth() + 1, // Months are zero-based in JavaScript, so add 1
+        year: date.getFullYear(),
+      });
     }
   };
 
@@ -215,6 +228,19 @@ function App() {
               <option value="M">Male</option>
               <option value="F">Female</option>
             </select>
+          </div>
+
+          {/* Date Picker */}
+          <div>
+            <label className="block text-sm font-medium text-orange-800 mb-2">
+              Select Date
+            </label>
+            <DatePicker
+              selected={new Date(formData.year, formData.month - 1, formData.day)}
+              onChange={handleDateChange}
+              className="indian-input w-full rounded-lg shadow-sm focus:ring-2 focus:ring-orange-500"
+              dateFormat="dd/MM/yyyy"
+            />
           </div>
 
           {/* Submit Button */}
