@@ -22,7 +22,7 @@ function App() {
     e.preventDefault();
     setIsLoading(true); // Start loading
     try {
-      const predictionUrl = 'http://localhost:8000/predict';
+      const predictionUrl = process.env.REACT_APP_PREDICTION_URL;
       const response = await axios.post(predictionUrl, formData);
       setPrediction(response.data.predicted_amount);
     } catch (error) {

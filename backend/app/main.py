@@ -4,15 +4,17 @@ import joblib
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
+from dotenv import load_dotenv
 import xgboost
 import pandas as pd
 
+# Load environment variables
+load_dotenv()
+
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# Get origins from environment variable and split into list
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost").split(",")
 
 app.add_middleware(
     CORSMiddleware,
