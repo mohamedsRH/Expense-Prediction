@@ -3,7 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { cities } from "./cities";
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css'; // Import CSS for date picker
+import 'react-datepicker/dist/react-datepicker.css';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -13,18 +13,22 @@ function App() {
     expense_type: '',
     day: 1,
     month: 1,
-    year: 2019
+    year: 2019,
   });
   const [prediction, setPrediction] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading
     try {
       const predictionUrl = 'http://localhost:8000/predict';
       const response = await axios.post(predictionUrl, formData);
       setPrediction(response.data.predicted_amount);
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -33,7 +37,7 @@ function App() {
       setFormData({
         ...formData,
         day: date.getDate(),
-        month: date.getMonth() + 1, // Months are zero-based in JavaScript, so add 1
+        month: date.getMonth() + 1,
         year: date.getFullYear(),
       });
     }
@@ -75,86 +79,9 @@ function App() {
             background: linear-gradient(45deg, #FF7F00, #FF9933);
             transform: translateY(-1px);
           }
-
-          .indian-flag {
-            height: 60px;
-            background: linear-gradient(to bottom,
-              #FF9933 33.33%,
-              #FFFFFF 33.33%, #FFFFFF 66.66%,
-              #138808 66.66%);
-            position: relative;
-            overflow: hidden;
-            border-radius: 4px;
-            margin-bottom: 20px;
-          }
-
-          .chakra {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            background: #000080;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .chakra::before {
-            content: '';
-            position: absolute;
-            width: 36px;
-            height: 36px;
-            border: 2px solid #FFFFFF;
-            border-radius: 50%;
-          }
-
-          .spokes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-          }
-
-          .spokes::before {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 40px;
-            background: #FFFFFF;
-            left: 50%;
-            transform-origin: 50% 50%;
-          }
-
-          @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-
-          .spokes {
-            animation: rotate 8s linear infinite;
-          }
-
-          .spokes::before {
-            box-shadow: 0 0 0 2px #FFFFFF,
-                      rotate(22.5deg) 0 0 0 2px #FFFFFF,
-                      rotate(45deg) 0 0 0 2px #FFFFFF,
-                      rotate(67.5deg) 0 0 0 2px #FFFFFF,
-                      rotate(90deg) 0 0 0 2px #FFFFFF,
-                      rotate(112.5deg) 0 0 0 2px #FFFFFF,
-                      rotate(135deg) 0 0 0 2px #FFFFFF,
-                      rotate(157.5deg) 0 0 0 2px #FFFFFF;
-          }
         `}
       </style>
       <div className="indian-border bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <div className="indian-flag">
-          <div className="chakra">
-            <div className="spokes"></div>
-          </div>
-        </div>
-        
         <h1 className="text-2xl font-bold text-orange-600 mb-6 text-center" style={{ fontFamily: 'Arial, sans-serif' }}>
           💰 Expense Prediction
         </h1>
@@ -248,14 +175,23 @@ function App() {
             <button
               type="submit"
               className="indian-button w-full py-2 px-4 rounded-lg transition duration-300"
+              disabled={isLoading} // Disable button while loading
             >
-              Predict Amount
+              {isLoading ? 'Loading...' : 'Predict Amount'}
             </button>
           </div>
         </form>
 
+        {/* Loading Spinner */}
+        {isLoading && (
+          <div className="mt-4 text-center">
+            <div className="loader border-t-4 border-orange-500 rounded-full w-8 h-8 mx-auto animate-spin"></div>
+            <p className="text-sm text-orange-600 mt-2">Processing your request...</p>
+          </div>
+        )}
+
         {/* Prediction Result */}
-        {prediction !== null && (
+        {prediction !== null && !isLoading && (
           <div className="mt-6 bg-orange-50 p-4 rounded-lg text-center border-2 border-orange-200">
             <h3 className="text-lg font-semibold text-orange-800">Predicted Amount</h3>
             <p className="text-xl text-orange-600 mt-2">₹{prediction.toFixed(2)}</p>
